@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - "./.data/db:/var/lib/mysql"
+       - "./.data/db-data/mysql.dump.sql:/docker-entrypoint-initdb.d/install_wordpress.sql"
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     build: ./wordpress
+     links:
+       - db
+     ports:
+       - "8000:80"
+     volumes:
+       - .wordpress/wp-content/themes/bones:/var/www/html/wp-content/themes/bones
+       #- .wordpress/wp-content/plugins:/var/www/html/wp-content/plugins
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: wordpress
